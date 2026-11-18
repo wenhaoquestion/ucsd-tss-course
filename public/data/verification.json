@@ -1,0 +1,470 @@
+{
+  "term": "WI27",
+  "checkedAt": "2026-11-18T06:46:40+00:00",
+  "catalogObservedAt": "2026-11-18T06:26:00+00:00",
+  "source": "https://classplanner.apps.ucsd.edu/api/v1/public/catalog/courses/search",
+  "reference": "fresh public search",
+  "statusesSeenInSource": {
+    "AC": 426,
+    "waitlist_only": 5
+  },
+  "cancelledCase": "No cancelled section in source",
+  "cases": [
+    {
+      "course": "AAS 170R",
+      "id": "WI27:161526",
+      "sections": [
+        "E 00010073"
+      ],
+      "covers": [
+        "SE",
+        "remote"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00010073"
+      ]
+    },
+    {
+      "course": "ANTH 110",
+      "id": "WI27:161699",
+      "sections": [
+        "E 00006202"
+      ],
+      "covers": [
+        "SE",
+        "waitlist only"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "BENG 152",
+      "id": "WI27:161869",
+      "sections": [
+        "E 00006901",
+        "E 00006902",
+        "E 00006903"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LA",
+        "LE",
+        "waitlist only"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "BENG 207",
+      "id": "WI27:161912",
+      "sections": [
+        "E 00006909"
+      ],
+      "covers": [
+        "FI",
+        "LE",
+        "waitlist only"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "BICD 110",
+      "id": "WI27:162226",
+      "sections": [
+        "E 00008946",
+        "E 00010143"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full",
+        "remote"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "BILD 1",
+      "id": "WI27:162158",
+      "sections": [
+        "E 00008870",
+        "E 00009800"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CAT 2",
+      "id": "WI27:161456",
+      "sections": [
+        "E 00010574",
+        "E 00014431"
+      ],
+      "covers": [
+        "DI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CHEM 6A",
+      "id": "WI27:162734",
+      "sections": [
+        "E 00008372",
+        "E 00009696"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "MI"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CHEM 7L",
+      "id": "WI27:162822",
+      "sections": [
+        "E 00008346",
+        "E 00008348"
+      ],
+      "covers": [
+        "LA",
+        "LE",
+        "MI",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "COGS 1",
+      "id": "WI27:163880",
+      "sections": [
+        "E 00007514",
+        "E 00007533"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "COMM 10",
+      "id": "WI27:168029",
+      "sections": [
+        "E 00007000",
+        "E 00007026"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00007000"
+      ]
+    },
+    {
+      "course": "CSE 6R",
+      "id": "WI27:164991",
+      "sections": [
+        "E 00010497",
+        "E 00010568"
+      ],
+      "covers": [
+        "DI",
+        "LE",
+        "full",
+        "remote"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CSE 11",
+      "id": "WI27:165032",
+      "sections": [
+        "E 00006918",
+        "E 00009857"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00006918",
+        "E 00009857"
+      ]
+    },
+    {
+      "course": "CSE 12",
+      "id": "WI27:165078",
+      "sections": [
+        "E 00006900",
+        "E 00009858"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CSE 30",
+      "id": "WI27:165068",
+      "sections": [
+        "E 00006954",
+        "E 00009843"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "CSE 100",
+      "id": "WI27:165248",
+      "sections": [
+        "E 00006957",
+        "E 00010033"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00006957",
+        "E 00010033"
+      ]
+    },
+    {
+      "course": "DSC 10",
+      "id": "WI27:166086",
+      "sections": [
+        "E 00007697",
+        "E 00007698",
+        "E 00007699"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LA",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00007697",
+        "E 00007698",
+        "E 00007699"
+      ]
+    },
+    {
+      "course": "ECE 35",
+      "id": "WI27:166381",
+      "sections": [
+        "E 00008640",
+        "E 00008652",
+        "E 00014131"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LA",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00008640",
+        "E 00008652"
+      ]
+    },
+    {
+      "course": "ECON 1",
+      "id": "WI27:167139",
+      "sections": [
+        "E 00007890",
+        "E 00007913"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "MI"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "HUM 1",
+      "id": "WI27:167305",
+      "sections": [
+        "E 00006052",
+        "E 00006054"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "MI",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "LIGN 8",
+      "id": "WI27:164542",
+      "sections": [
+        "E 00006292"
+      ],
+      "covers": [
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00006292"
+      ]
+    },
+    {
+      "course": "MATH 18",
+      "id": "WI27:163247",
+      "sections": [
+        "E 00009249",
+        "E 00009253",
+        "EL00007271"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LA",
+        "LE",
+        "TBA",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "MATH 20C",
+      "id": "WI27:163118",
+      "sections": [
+        "E 00009196",
+        "E 00009199"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "MI",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "MGT 16",
+      "id": "WI27:164234",
+      "sections": [
+        "E 00006329"
+      ],
+      "covers": [
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00006329"
+      ]
+    },
+    {
+      "course": "MMW 12",
+      "id": "WI27:164796",
+      "sections": [
+        "E 00006517",
+        "E 00006576"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "PHIL 10",
+      "id": "WI27:166527",
+      "sections": [
+        "E 00007758",
+        "E 00007777"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "PHYS 2A",
+      "id": "WI27:167163",
+      "sections": [
+        "E 00007266",
+        "E 00007281"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": [
+        "E 00007266"
+      ]
+    },
+    {
+      "course": "PSYC 1",
+      "id": "WI27:163966",
+      "sections": [
+        "E 00008827"
+      ],
+      "covers": [
+        "FI",
+        "LE"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "TDGE 1",
+      "id": "WI27:163753",
+      "sections": [
+        "E 00007395",
+        "E 00007433"
+      ],
+      "covers": [
+        "DI",
+        "FI",
+        "LE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    },
+    {
+      "course": "WCWP 10A",
+      "id": "WI27:166397",
+      "sections": [
+        "E 00005753"
+      ],
+      "covers": [
+        "SE",
+        "full"
+      ],
+      "seatCountsChangedSinceCapture": []
+    }
+  ]
+}

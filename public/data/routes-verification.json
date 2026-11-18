@@ -1,0 +1,205 @@
+{
+  "checkedAt": "2026-11-18T06:27:58+00:00",
+  "graphDate": "2026-11-18",
+  "method": "OSM-based network distances between the same access points, computed by two independent routing engines. Not measured walking times.",
+  "reference": "https://routing.openstreetmap.de/about.html",
+  "query": "https://routing.openstreetmap.de/routed-foot/table/v1/foot/-117.237316,32.878002;-117.239698,32.874648;-117.234003,32.880620;-117.233994,32.882202;-117.240059,32.880099;-117.239518,32.880835;-117.240606,32.874124;-117.234860,32.883269?annotations=distance",
+  "pairs": [
+    {
+      "from": "CENTR",
+      "to": "YORK",
+      "localMeters": 895,
+      "referenceMeters": 896,
+      "differenceMeters": -1
+    },
+    {
+      "from": "CENTR",
+      "to": "WLH",
+      "localMeters": 568,
+      "referenceMeters": 568,
+      "differenceMeters": 0
+    },
+    {
+      "from": "CENTR",
+      "to": "EBU3B",
+      "localMeters": 738,
+      "referenceMeters": 738,
+      "differenceMeters": 0
+    },
+    {
+      "from": "CENTR",
+      "to": "PETER",
+      "localMeters": 456,
+      "referenceMeters": 462,
+      "differenceMeters": -6
+    },
+    {
+      "from": "CENTR",
+      "to": "SOLIS",
+      "localMeters": 480,
+      "referenceMeters": 478,
+      "differenceMeters": 2
+    },
+    {
+      "from": "CENTR",
+      "to": "GH",
+      "localMeters": 719,
+      "referenceMeters": 718,
+      "differenceMeters": 1
+    },
+    {
+      "from": "CENTR",
+      "to": "FAH",
+      "localMeters": 773,
+      "referenceMeters": 778,
+      "differenceMeters": -5
+    },
+    {
+      "from": "YORK",
+      "to": "WLH",
+      "localMeters": 1443,
+      "referenceMeters": 1443,
+      "differenceMeters": 0
+    },
+    {
+      "from": "YORK",
+      "to": "EBU3B",
+      "localMeters": 1588,
+      "referenceMeters": 1588,
+      "differenceMeters": 0
+    },
+    {
+      "from": "YORK",
+      "to": "PETER",
+      "localMeters": 1025,
+      "referenceMeters": 1024,
+      "differenceMeters": 1
+    },
+    {
+      "from": "YORK",
+      "to": "SOLIS",
+      "localMeters": 1119,
+      "referenceMeters": 1118,
+      "differenceMeters": 1
+    },
+    {
+      "from": "YORK",
+      "to": "GH",
+      "localMeters": 246,
+      "referenceMeters": 246,
+      "differenceMeters": 0
+    },
+    {
+      "from": "YORK",
+      "to": "FAH",
+      "localMeters": 1623,
+      "referenceMeters": 1628,
+      "differenceMeters": -5
+    },
+    {
+      "from": "WLH",
+      "to": "EBU3B",
+      "localMeters": 251,
+      "referenceMeters": 250,
+      "differenceMeters": 1
+    },
+    {
+      "from": "WLH",
+      "to": "PETER",
+      "localMeters": 663,
+      "referenceMeters": 665,
+      "differenceMeters": -2
+    },
+    {
+      "from": "WLH",
+      "to": "SOLIS",
+      "localMeters": 639,
+      "referenceMeters": 642,
+      "differenceMeters": -3
+    },
+    {
+      "from": "WLH",
+      "to": "GH",
+      "localMeters": 1266,
+      "referenceMeters": 1265,
+      "differenceMeters": 1
+    },
+    {
+      "from": "WLH",
+      "to": "FAH",
+      "localMeters": 380,
+      "referenceMeters": 379,
+      "differenceMeters": 1
+    },
+    {
+      "from": "EBU3B",
+      "to": "PETER",
+      "localMeters": 768,
+      "referenceMeters": 768,
+      "differenceMeters": 0
+    },
+    {
+      "from": "EBU3B",
+      "to": "SOLIS",
+      "localMeters": 703,
+      "referenceMeters": 703,
+      "differenceMeters": 0
+    },
+    {
+      "from": "EBU3B",
+      "to": "GH",
+      "localMeters": 1385,
+      "referenceMeters": 1392,
+      "differenceMeters": -7
+    },
+    {
+      "from": "EBU3B",
+      "to": "FAH",
+      "localMeters": 190,
+      "referenceMeters": 190,
+      "differenceMeters": 0
+    },
+    {
+      "from": "PETER",
+      "to": "SOLIS",
+      "localMeters": 123,
+      "referenceMeters": 123,
+      "differenceMeters": 0
+    },
+    {
+      "from": "PETER",
+      "to": "GH",
+      "localMeters": 779,
+      "referenceMeters": 778,
+      "differenceMeters": 1
+    },
+    {
+      "from": "PETER",
+      "to": "FAH",
+      "localMeters": 794,
+      "referenceMeters": 799,
+      "differenceMeters": -5
+    },
+    {
+      "from": "SOLIS",
+      "to": "GH",
+      "localMeters": 873,
+      "referenceMeters": 872,
+      "differenceMeters": 1
+    },
+    {
+      "from": "SOLIS",
+      "to": "FAH",
+      "localMeters": 724,
+      "referenceMeters": 729,
+      "differenceMeters": -5
+    },
+    {
+      "from": "GH",
+      "to": "FAH",
+      "localMeters": 1420,
+      "referenceMeters": 1432,
+      "differenceMeters": -12
+    }
+  ]
+}

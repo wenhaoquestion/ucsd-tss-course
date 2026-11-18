@@ -1,0 +1,17 @@
+UCSD campus pedestrian map
+
+The geographic data in routes-graph.json and the derived campus distance tables are © OpenStreetMap contributors, made available under the Open Database License 1.0 (ODbL).
+https://www.openstreetmap.org/copyright
+https://opendatacommons.org/licenses/odbl/1-0/
+Download the complete derived graph at routes-graph.json, alongside this notice. Its coordinates are local metres east and south of the origin recorded in that file. Edge lengths are stored in decimetres. The final flag excludes a mapped stair or another known barrier from the avoid-stairs profile.
+
+Five extracts of OpenStreetMap's public map API cover the main La Jolla campus and Scripps. The data was fetched on 2026-11-18 UTC (November 17 in San Diego). Each building includes the source OSM way or relation identifier. The registrar building codes were matched by building name. Existing UCSD room and building links open UCSD Classroom Explorer:
+https://github.com/wenhaoquestion/ucsd-classrooms
+https://campusmap.ucsd.edu/
+
+17 of 71 matched buildings have a tagged entrance connected to the path network. Other matched points end on a mapped pedestrian route near the building footprint. Each building uses one representative access point. Indoor geometry, doorway widths, elevator availability, event closures and construction detours are unverified. The no-stairs profile excludes recorded steps and known barriers; unknown accessibility stays visible in the planner.
+
+The independent FOSSGIS foot-routing service was queried once for the walking-distance matrix of eight public school buildings. The 28 pairwise comparisons in routes-verification.json use the same OSM-derived endpoints. This cross-check measures agreement between routing engines, not individual walking times.
+https://routing.openstreetmap.de/about.html
+
+Reproducible scripts: scripts/map-fetch.py (OSM download), scripts/map-build.py (offline graph and distance tables), scripts/map-verify.py (independent comparison), scripts/map-tests.ts (path integrity and estimator tests).

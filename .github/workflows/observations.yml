@@ -1,0 +1,36 @@
+name: Public seat observations
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/observations.yml"
+      - "server/catalog.go"
+      - "server/publish.go"
+      - "scripts/publish-observations.sh"
+  workflow_dispatch:
+    inputs:
+      term:
+        description: UCSD term code
+        default: WI27
+        required: true
+  schedule:
+    - cron: "37 * * * *"
+permissions:
+  contents: write
+concurrency:
+  group: publish-public-observations
+  cancel-in-progress: false
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache-dependency-path: server/go.sum
+      - name: Observe and publish changed seat counts
+        env:
+          OBSERVATION_TERM: ${{ inputs.term || vars.OBSERVATION_TERM || 'WI27' }}
+        run: bash scripts/publish-observations.sh "$OBSERVATION_TERM"
