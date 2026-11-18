@@ -39,8 +39,24 @@ const remote =
   /^(RCLAS|REMOTE|ONLINE|WEB|VIRTUAL|ZOOM|ONLINE ASYNCHRONOUS|ONLINE SYNCHRONOUS)$/;
 const unknown =
   /^(|TBA|TBD|TBC|ARR|ARRANGED|UNKNOWN|N\/A|NONE|-|—|TO BE ANNOUNCED|TO BE ARRANGED)$/;
-export const locationCode = (location: TransferLocation) =>
-  location.remote ? "RCLAS" : (location.building ?? "").trim().toUpperCase();
+const fullBuildingNames = new Map([
+  ["MCTF - MARINE CONSERVATION AND TECHNOLOGY", "MCTF"],
+  ["MEDICAL EDUCATION AND TELEMEDICINE CENTER", "MET"],
+  ["SCIENCE AND ENGINEERING RESEARCH FACILITY", "SERF"],
+  ["WARREN STUDENT ACTIVITY CENTER", "WSAC"],
+]);
+
+export function locationCode(location: TransferLocation) {
+  if (location.remote) return "RCLAS";
+  const code = (location.building ?? "").trim().toUpperCase();
+  if (code === "EXTENDED STUDIES AND PUBLIC PROGRAMS") {
+    // The public floor archive places these WI27 rooms in two different wings.
+    const room = listedRoom(location);
+    if (/^12[345]$/.test(room)) return "UNEXG";
+    if (/^12[67]$/.test(room)) return "UNEXN";
+  }
+  return fullBuildingNames.get(code) ?? code;
+}
 
 const reasonText: Record<TransferReason, [string, string]> = {
   sameRoom: ["Both meetings use the same listed room.", "两节课在同一间教室。"],

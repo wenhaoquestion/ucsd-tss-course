@@ -34,7 +34,9 @@ function FloorDrawing({
   const top = Math.min(...points.map(([, y]) => y));
   const bottom = Math.max(...points.map(([, y]) => y));
   const margin = Math.max(right - left, bottom - top) * 0.08 + 1;
-  const selected = rooms.find((room) => room.id === highlight);
+  const selected = highlight
+    ? rooms.find((room) => room.id === highlight)
+    : undefined;
   const ring = selected?.footprint?.outer;
   const anchor =
     selected?.labelAt ??
@@ -56,11 +58,13 @@ function FloorDrawing({
       {rooms.map((room) => (
         <path
           className={
-            room.id === highlight ? "qp-room-highlight" : "qp-room-outline"
+            highlight && room.id === highlight
+              ? "qp-room-highlight"
+              : "qp-room-outline"
           }
           d={polygonPath(room.footprint!)}
           fillRule="evenodd"
-          key={room.id}
+          key={room.id ?? room.label}
         />
       ))}
       {anchor && selected && (

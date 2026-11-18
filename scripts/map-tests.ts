@@ -6,6 +6,7 @@ import {
   canShowClassroom,
   estimateTransfer,
   listedRoom,
+  locationCode,
 } from "../src/routing/index";
 import { walkingPath, type RouteGraph } from "../src/routing/graph";
 import { findRoom, type Floor } from "../src/routing/indoor";
@@ -94,6 +95,17 @@ test("missing paths, remote meeting places and unverified access remain explicit
   assert.equal(canShowClassroom({ building: "TBA" }), false);
   assert.equal(canShowClassroom(a), true);
   assert.equal(listedRoom({ building: "MOS", room: "0113" }), "0113");
+  const complex = "Extended Studies and Public Programs";
+  assert.equal(locationCode({ building: complex, room: "123" }), "UNEXG");
+  assert.equal(locationCode({ building: complex, room: "126" }), "UNEXN");
+  assert.equal(
+    locationCode({ building: complex, room: "129" }),
+    complex.toUpperCase(),
+  );
+  assert.equal(
+    locationCode({ building: "Warren Student Activity Center" }),
+    "WSAC",
+  );
 });
 
 test("public maps only highlight rooms with an unambiguous matching schedule key or label", () => {
@@ -113,7 +125,13 @@ test("public maps only highlight rooms with an unambiguous matching schedule key
   const stages = { building: "MOS", name: "Mosaic", floors: [first] };
   assert.equal(findRoom(stages, "0113")?.room.id, "a");
   assert.equal(findRoom(stages, "113"), undefined);
-  assert.equal(findRoom(stages, "102"), undefined);
+  assert.equal(findRoom(stages, "102")?.floor.id, "1");
+  assert.equal(findRoom(stages, "102")?.room.footprint, undefined);
+  const otherFloor = { ...first, id: "2" };
+  assert.equal(
+    findRoom({ ...stages, floors: [first, otherFloor] }, "102"),
+    undefined,
+  );
   assert.equal(findRoom(stages, "b402a")?.room.id, "d");
   assert.equal(findRoom(stages, "R101")?.room.footprint, undefined);
 });

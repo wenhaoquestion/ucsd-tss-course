@@ -2,7 +2,7 @@ import type { Point } from "./graph";
 
 type Polygon = { outer: Point[]; holes?: Point[][] };
 type Room = {
-  id: string;
+  id?: string;
   label: string;
   scheduleKey?: string | null;
   footprint?: Polygon;
@@ -81,7 +81,10 @@ export function loadIndoorLayout(code: string) {
   return request;
 }
 
-export function findRoom(layout: IndoorLayout, number: string) {
+export function findRoom(
+  layout: IndoorLayout,
+  number: string,
+): { floor: Floor; room: Room } | undefined {
   const normalized = (value: string) =>
     value.trim().toUpperCase().replace(/\s+/g, "");
   const key = normalized(number);
@@ -102,11 +105,14 @@ export function findRoom(layout: IndoorLayout, number: string) {
   const explicit = candidates.filter(
     ({ room }) => room.scheduleKey && normalized(room.scheduleKey) === key,
   );
-  if (explicit.length) return explicit.length === 1 ? explicit[0] : undefined;
-  const labels = candidates.filter(
-    ({ room }) => normalized(room.label) === key,
-  );
-  return labels.length === 1 ? labels[0] : undefined;
+  const matches = explicit.length
+    ? explicit
+    : candidates.filter(({ room }) => normalized(room.label) === key);
+  const first = matches[0];
+  if (matches.length < 2) return first;
+  if (matches.every(({ floor }) => floor.id === first.floor.id))
+    return { floor: first.floor, room: { label: first.room.label } };
+  return undefined;
 }
 
 export function polygonPath(polygon: Polygon) {

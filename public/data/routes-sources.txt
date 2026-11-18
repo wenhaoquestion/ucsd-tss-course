@@ -8,6 +8,7 @@ Download the complete derived graph at routes-graph.json, alongside this notice.
 Five extracts of OpenStreetMap's public map API cover the main La Jolla campus and Scripps. The data was fetched on 2026-11-18 UTC (November 17 in San Diego). Each building includes the source OSM way or relation identifier. Registrar building codes were matched by building name.
 
 Classroom cards load published room and floor geometry within Quarterplan from UCSD Classroom Explorer. Floor labels and room positions are taken from that public data. If the archive has only a room listing or if the room is ambiguous, Quarterplan leaves the room position unmarked. The campus map distinguishes representative entry points from nearby paths.
+For WI27, the public Extended Studies and Public Programs floor plans distinguish rooms 123–125 in Building G from rooms 126–127 in Building N. The catalog uses the same complex name for those rooms.
 https://github.com/wenhaoquestion/ucsd-classrooms
 https://github.com/wenhaoquestion/ucsd-classrooms/blob/main/docs/indoor-geometry.md
 https://campusmap.ucsd.edu/
