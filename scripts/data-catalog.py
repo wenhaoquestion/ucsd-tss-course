@@ -21,6 +21,7 @@ TSSPLUS = "https://tssplusplus-api.onrender.com/api/courses/"
 TSSPLUS_REV = "69f67dfaac8f89615266d67c891ceef02098fb01"
 TSSPLUS_RAW = f"https://raw.githubusercontent.com/alchin2/tssplusplus/{TSSPLUS_REV}/"
 ROOM_ARCHIVE = "68de978591a6d80814fc9592f8ec9c9edf150d20"
+ROOM_ARCHIVE_RAW = f"https://raw.githubusercontent.com/SahirSSharma/WebReg/{ROOM_ARCHIVE}/"
 CLASSROOMS_REV = "30608ac0030af314692193400a89f4247726ad89"
 CLASSROOMS_RAW = f"https://raw.githubusercontent.com/wenhaoquestion/ucsd-classrooms/{CLASSROOMS_REV}/"
 STARTER = ("CSE 11", "CSE 12", "CSE 100", "MATH 18", "MATH 20C", "COGS 1",
@@ -97,8 +98,6 @@ def archived_courses():
         for filename in sorted(archive.namelist()):
             if re.fullmatch(r"[^/]+/data/parsed/WI27/[A-Z0-9]+\.json", filename):
                 courses.extend(json.loads(archive.read(filename)))
-        license_data = archive.read(f"WebReg-{ROOM_ARCHIVE}/LICENSE")
-        (DATA / "webreg-course-data-LICENSE.txt").write_bytes(license_data)
     if not courses:
         raise ValueError("WI27 room archive was empty")
     return courses
@@ -271,7 +270,8 @@ def run():
     for course in cached("webreg-" + ROOM_ARCHIVE + ".json", archived_courses):
         code = clean_code(course["subject"] + " " + course["number"])
         archive[code].update(archived_rooms(course, buildings))
-    for owner, url in (("tssplusplus", TSSPLUS_RAW), ("classroom-codes", CLASSROOMS_RAW)):
+    for owner, url in (("tssplusplus", TSSPLUS_RAW), ("classroom-codes", CLASSROOMS_RAW),
+                       ("webreg-course-data", ROOM_ARCHIVE_RAW)):
         (DATA / f"{owner}-LICENSE.txt").write_bytes(get(url + "LICENSE"))
     ids = {clean_code(row["code"]): row["module_id"] for row in
            csv.DictReader(io.StringIO(get(TSSPLUS_RAW + "data/offered/wi27.csv").decode("utf-8-sig")))}
@@ -279,7 +279,11 @@ def run():
     for code in STARTER:
         if code in ids:
             module = ids[code]
-            detail = cached(f"room-{module}.json", lambda: json.loads(get(f"{TSSPLUS}{module}?term=wi27")))
+            try:
+                detail = cached(f"room-{module}.json", lambda: json.loads(get(f"{TSSPLUS}{module}?term=wi27")))
+            except (TimeoutError, URLError) as error:
+                print(f"{code}: TSS++ unavailable ({error}); using the pinned room archive", flush=True)
+                continue
             if clean_code(detail["code"]).split("/")[0] == code:
                 annotations[code] = rooms_for(detail, buildings)
     # Topic offerings can have the same catalog number. Keep each schedulable
