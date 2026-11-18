@@ -35,11 +35,18 @@ import {
   place,
   clock,
   trustedBooking,
+  officialTSS,
   weekdays,
   dayZh,
 } from "./model";
 import { weekTiles, gaps, isFinal, timed, overlap, type Gap } from "./calendar";
-import { estimateTransfer, classroomUrl } from "./routing";
+import {
+  canShowClassroom,
+  estimateTransfer,
+  listedRoom,
+  locationCode,
+  type TransferLocation,
+} from "./routing";
 import {
   loadCatalog,
   apiBase,
@@ -58,11 +65,11 @@ import {
 import { CalendarView, colors } from "./CalendarView";
 import { Insights } from "./Insights";
 import { Dialog, ToolPanel, copyText } from "./ToolPanel";
-import { seedPlan } from "./starter";
 import { latestSeats } from "./observations";
 const RouteMap = lazy(() =>
   import("./routing/RouteMap").then((m) => ({ default: m.RouteMap })),
 );
+const ClassroomMap = lazy(() => import("./routing/ClassroomMap"));
 type Mode =
   "generate" | "tools" | "booking" | "search" | "watch" | "alternatives" | null;
 const unitsOf = (c: Course) => Number.parseFloat(c.units) || 0;
@@ -151,6 +158,7 @@ function App() {
     [pushMessage, setPushMessage] = useState(""),
     [live, setLive] = useState<Record<string, Seat>>({}),
     [picked, setPicked] = useState<Course | null>(null),
+    [room, setRoom] = useState<TransferLocation | null>(null),
     [optId, setOptId] = useState(""),
     [sectionQuery, setSectionQuery] = useState<string | null>(() =>
       new URLSearchParams(location.search).get("section"),
@@ -158,6 +166,7 @@ function App() {
   const [dataTry, setDataTry] = useState(0),
     [sharedPlan, setSharedPlan] = useState<Selection[] | null>(null);
   const stateRef = useRef(s);
+  const tssTab = useRef<Window | null>(null);
   stateRef.current = s;
   const t: T = (en, zh) => (s.lang === "zh" ? zh : en);
   useEffect(() => {
@@ -181,15 +190,12 @@ function App() {
       }
       if (!active) return;
       const st = previous || initial();
-      const picks = previous ? st.plans[st.active] : seedPlan(seed);
-      st.plans = [...st.plans] as Saved["plans"];
-      st.plans[st.active] = picks;
       if (shared) {
-        if (previous && picks.length) {
+        if (st.plans[st.active].length) {
           setSharedPlan(shared);
         } else {
+          st.plans = [...st.plans] as Saved["plans"];
           st.plans[st.active] = shared;
-          st.example = false;
         }
         const u = new URL(location.href);
         u.searchParams.delete("plan");
@@ -428,7 +434,7 @@ function App() {
     setS((prev) => {
       const plans = [...prev.plans] as Saved["plans"];
       plans[prev.active] = p;
-      return { ...prev, plans, example: false };
+      return { ...prev, plans };
     });
     setOverride(null);
   }
@@ -465,20 +471,45 @@ function App() {
     );
     setMode("search");
   }
+  function openTSS(url = officialTSS) {
+    if (tssTab.current && !tssTab.current.closed) {
+      try {
+        tssTab.current.location.href = url;
+        tssTab.current.focus();
+        return true;
+      } catch {
+        tssTab.current = null;
+      }
+    }
+    const tab = window.open(url, "QuarterplanTSS");
+    if (!tab) {
+      setNotice(t("Allow pop-ups to open TSS.", "请允许弹出窗口以打开 TSS。"));
+      return false;
+    }
+    tab.opener = null;
+    tssTab.current = tab;
+    return true;
+  }
   function book(e: Entry) {
     const url = trustedBooking(e.option);
-    window.open(url, "QuarterplanTSS");
-    if (url === "https://sis.ucsd.edu/" && e.option.sectionId)
-      copyText(e.option.sectionId)
+    const id = url === officialTSS ? e.option.sectionId : "";
+    const copy = id ? copyText(id) : undefined;
+    const opened = openTSS(url);
+    if (copy)
+      copy
         .then(() =>
           setNotice(
             t(
-              "Section ID copied. Confirm Book/Save in TSS.",
-              "已复制班号，请在 TSS 确认 Book/Save。",
+              opened
+                ? "Section ID copied. Paste it in TSS."
+                : "Section ID copied. Allow pop-ups to open TSS.",
+              opened
+                ? "已复制班号，可粘贴到 TSS。"
+                : "已复制班号。请允许弹出窗口以打开 TSS。",
             ),
           ),
         )
-        .catch(() => setNotice("Section ID " + e.option.sectionId));
+        .catch(() => setNotice("Section ID " + id));
   }
   const found = entry
     ? s.watches.find((w) => w.sectionId === entry.option.sectionId)
@@ -554,6 +585,13 @@ function App() {
       ? null
       : Math.min(...(counts as number[]));
   };
+  const previewRooms = Array.from(
+    new Map(
+      (picked?.options.find((option) => option.id === optId)?.meetings || [])
+        .filter(canShowClassroom)
+        .map((meeting) => [place(meeting), meeting] as const),
+    ),
+  );
   const total = plan.reduce((a, e) => a + unitsOf(e.course), 0);
   return (
     <div className="app">
@@ -597,6 +635,10 @@ function App() {
         </button>
       </header>
       <div className="toolbar">
+        <div className="plan-title">
+          <h1>{t("Your course plan", "我的课表")}</h1>
+          <span className="term">{t("Winter 2027", "2027 冬季")}</span>
+        </div>
         <div className="select-shell plan-select">
           <Layers size={15} />
           <select
@@ -614,22 +656,22 @@ function App() {
           </select>
           <ChevronDown size={13} />
         </div>
-        <span className="tool-sep" />
-        <span className="term">{t("Winter 2027", "2027 冬季")}</span>
-        {s.example && s.active === 0 && plan.length > 0 && (
-          <span className="example">{t("Example schedule", "示例课表")}</span>
-        )}
         <div className="toolbar-right">
-          <button className="booking-btn" onClick={() => setMode("booking")}>
+          <button
+            className="booking-btn"
+            aria-label={t("Booking checklist", "选课清单")}
+            onClick={() => setMode("booking")}
+          >
             <CalendarClock size={15} />
             <span>{t("Booking checklist", "选课清单")}</span>
           </button>
           <button
-            className="icon-btn tools"
+            className="outline tools"
             aria-label={t("Plan tools", "课表工具")}
             onClick={() => setMode("tools")}
           >
-            <Ellipsis size={19} />
+            <Ellipsis size={18} />
+            <span>{t("Plan tools", "课表工具")}</span>
           </button>
         </div>
       </div>
@@ -670,60 +712,87 @@ function App() {
               </button>
             </>
           ) : (
-            s.watches.map((w) => (
-              <div className="watch-row" key={w.sectionId}>
-                <button
-                  onClick={() => {
-                    const c = by.get(w.code);
-                    if (c) {
-                      search(c);
-                      setOptId(
-                        c.options.find((o) => o.sectionId === w.sectionId)
-                          ?.id || "",
-                      );
-                    }
-                  }}
-                >
-                  <b>{w.code}</b>
-                  <small>
-                    {w.sectionId} · {t("Alert at", "提醒阈值")} {w.threshold} ·{" "}
-                    {w.remote
-                      ? t("Browser push", "浏览器推送")
-                      : t("While open", "页面内提醒")}
-                  </small>
-                </button>
-                <span>
-                  {(live[w.sectionId]
-                    ? live[w.sectionId].available
-                    : w.previous) ?? "—"}{" "}
-                  {t("open", "余位")}
-                </span>
-                <button
-                  className="icon-btn"
-                  onClick={() => removeWatch(w)}
-                  aria-label={t("Unfollow", "取消关注")}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))
+            s.watches.map((w) => {
+              const course = by.get(w.code);
+              const option = course?.options.find(
+                (o) => o.sectionId === w.sectionId,
+              );
+              return (
+                <div className="watch-row" key={w.sectionId}>
+                  <button
+                    onClick={() => {
+                      if (course && option) {
+                        search(course);
+                        setOptId(option.id);
+                      }
+                    }}
+                    disabled={!option}
+                  >
+                    <b>{w.code}</b>
+                    <small>
+                      {w.sectionId} · {t("Alert at", "提醒阈值")} {w.threshold}{" "}
+                      ·{" "}
+                      {w.remote
+                        ? t("Browser push", "浏览器推送")
+                        : t("While open", "页面内提醒")}
+                    </small>
+                  </button>
+                  <span>
+                    {(live[w.sectionId]
+                      ? live[w.sectionId].available
+                      : w.previous) ?? "—"}{" "}
+                    {t("open", "余位")}
+                  </span>
+                  {course && option && (
+                    <button
+                      className="outline watch-tss"
+                      onClick={() => book({ course, option })}
+                    >
+                      <span>
+                        {trustedBooking(option) === officialTSS
+                          ? t("Copy ID & open TSS", "复制班号并前往 TSS")
+                          : t("Open TSS", "前往 TSS")}
+                      </span>
+                      <ArrowUpRight size={14} />
+                    </button>
+                  )}
+                  <button
+                    className="icon-btn"
+                    onClick={() => removeWatch(w)}
+                    aria-label={t("Unfollow", "取消关注")}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              );
+            })
           )}
         </main>
       ) : (
-        <main className="workspace">
+        <main className={"workspace" + (plan.length ? "" : " is-empty")}>
           <aside className="courses-pane">
             <div className="side-title">
               <h2>{t("Courses", "课程")}</h2>
-              <span className="count">
-                {String(plan.length).padStart(2, "0")}
-              </span>
+              {plan.length > 0 && <span className="count">{plan.length}</span>}
             </div>
             <button className="search-button" onClick={() => search()}>
               <Search size={15} />
               {t("Search courses", "搜索课程")}
-              <Plus size={12} />
+              <Plus size={14} />
             </button>
             <div className="course-list">
+              {!plan.length && (
+                <div className="sidebar-empty">
+                  <BookOpen size={20} aria-hidden="true" />
+                  <strong>{t("No courses yet", "尚未添加课程")}</strong>
+                  <p>
+                    {t(
+                      "Search by course, instructor, or section ID.",
+                      "可按课程、教师或班号搜索。",
+                    )}
+                  </p>
+                </div>
+              )}
               {plan.map((e, i) => (
                 <button
                   key={e.course.code}
@@ -751,6 +820,8 @@ function App() {
               </div>
               <button
                 className="outline wide"
+                disabled={!plan.length}
+                aria-label={t("Generate schedules", "自动排课")}
                 onClick={() => setMode("generate")}
               >
                 <SlidersHorizontal size={14} />
@@ -773,6 +844,7 @@ function App() {
             buffer={s.prefs.buffer}
             stepFree={s.prefs.stepFree}
             onSearch={() => search()}
+            onImport={() => setMode("tools")}
           />
           <aside className="inspector">
             {entry ? (
@@ -809,8 +881,8 @@ function App() {
                             bufferMinutes: s.prefs.buffer,
                             stepFree: s.prefs.stepFree,
                           }}
-                          term="WI27"
                           lang={s.lang}
+                          onShowClassroom={setRoom}
                         />
                       </Suspense>
                     </>
@@ -835,7 +907,7 @@ function App() {
                       </button>
                       <div className="meeting-list">
                         {entry.option.meetings.map((m, i) => {
-                          const href = classroomUrl(m, "WI27");
+                          const hasLocation = canShowClassroom(m);
                           return (
                             <div key={i}>
                               <b>{m.type}</b>
@@ -852,15 +924,15 @@ function App() {
                                   ? clock(m.start) + "–" + clock(m.end)
                                   : "TBA"}
                                 <small>
-                                  {href ? (
-                                    <a
-                                      href={href}
-                                      target="_blank"
-                                      rel="noreferrer"
+                                  {hasLocation ? (
+                                    <button
+                                      className="meeting-map"
+                                      onClick={() => setRoom(m)}
                                     >
                                       <MapPin size={12} />
-                                      {place(m)} ↗
-                                    </a>
+                                      {place(m)}
+                                      <ChevronRight size={12} />
+                                    </button>
                                   ) : (
                                     place(m)
                                   )}
@@ -940,7 +1012,10 @@ function App() {
                 </div>
                 <div className="enroll-actions">
                   <button className="primary" onClick={() => book(entry)}>
-                    {t("Open TSS", "前往 TSS")}
+                    {trustedBooking(entry.option) === officialTSS &&
+                    entry.option.sectionId
+                      ? t("Copy ID & open TSS", "复制班号并前往 TSS")
+                      : t("Open TSS", "前往 TSS")}
                     <ArrowUpRight size={15} />
                   </button>
                   <button
@@ -959,16 +1034,28 @@ function App() {
                 </div>
               </>
             ) : (
-              <div className="empty-inspector">
-                <MapPin size={24} />
-                <h2>{t("Course details", "课程详情")}</h2>
-                <p>
-                  {t(
-                    "Choose a course or a walk on the calendar.",
-                    "选择课程或课间查看详情。",
-                  )}
-                </p>
-              </div>
+              <>
+                <div className="side-title">
+                  <h2>{t("Course details", "课程详情")}</h2>
+                </div>
+                <div className="empty-inspector">
+                  <span className="empty-icon">
+                    <MapPin size={24} aria-hidden="true" />
+                  </span>
+                  <p>
+                    {t(
+                      "Select a course to see meeting times, rooms and grades.",
+                      "选择课程后可查看上课时间、教室和历史给分。",
+                    )}
+                  </p>
+                </div>
+                <div className="blank-enrollment">
+                  <h3>{t("TSS enrollment", "TSS 选课")}</h3>
+                  <button className="outline wide" onClick={() => openTSS()}>
+                    {t("Open TSS", "前往 TSS")} <ArrowUpRight size={15} />
+                  </button>
+                </div>
+              </>
             )}
           </aside>
         </main>
@@ -984,6 +1071,25 @@ function App() {
           UC San Diego
         </span>
       </footer>
+      {room && (
+        <Dialog
+          title={[locationCode(room), listedRoom(room)]
+            .filter(Boolean)
+            .join(" ")}
+          onClose={() => setRoom(null)}
+          className="classroom-dialog"
+        >
+          <Suspense
+            fallback={
+              <div className="map-skeleton" role="status">
+                {t("Loading classroom…", "正在加载教室…")}
+              </div>
+            }
+          >
+            <ClassroomMap place={room} locale={s.lang} showTitle={false} />
+          </Suspense>
+        </Dialog>
+      )}
       {mode === "search" && (
         <Dialog
           title={picked ? picked.code : t("Find courses", "查找课程")}
@@ -1049,6 +1155,22 @@ function App() {
                   </label>
                 ))}
               </div>
+              {previewRooms.length > 0 && (
+                <div
+                  className="preview-rooms"
+                  aria-label={t("Classroom locations", "上课地点")}
+                >
+                  {previewRooms.map(([name, meeting]) => (
+                    <button
+                      key={name}
+                      className="outline"
+                      onClick={() => setRoom(meeting)}
+                    >
+                      <MapPin size={13} /> {name}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="modal-actions">
                 {plan.some((e) => e.course.code === picked.code) && (
                   <button
@@ -1287,7 +1409,7 @@ function App() {
                   setS((prev) => {
                     const plans = [...prev.plans] as Saved["plans"];
                     plans[index] = sharedPlan;
-                    return { ...prev, plans, active: index, example: false };
+                    return { ...prev, plans, active: index };
                   });
                   setSharedPlan(null);
                 }}

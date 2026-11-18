@@ -209,7 +209,7 @@ async function contextFor(browser, url) {
       }
     }).observe({ type: "largest-contentful-paint", buffered: true });
     const observer = new MutationObserver(() => {
-      if (document.querySelector(".calendar-grid .event")) {
+      if (document.querySelector("main.workspace")) {
         requestAnimationFrame(() => {
           window.__measure.ready = performance.now();
         });
@@ -221,14 +221,11 @@ async function contextFor(browser, url) {
   const faults = [];
   page.on("pageerror", (e) => faults.push(e.message));
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-  // The first calendar event can belong to another weekday, intentionally hidden on phones.
   await page
-    .getByRole("heading", { name: "Weekly calendar" })
+    .getByRole("heading", { name: "Build your schedule" })
     .waitFor({ timeout: 30000 });
-  await page
-    .locator(".calendar-grid .event")
-    .first()
-    .waitFor({ state: "attached", timeout: 30000 });
+  if (await page.locator(".calendar-grid .event").count())
+    throw Error("A new plan should start without any classes");
   if (!/Quarterplan/i.test(await page.title()))
     throw Error("Page title did not identify the production application");
   // Wait until the first viewport has rendered and upcoming visual changes from the full catalog have settled.
@@ -301,15 +298,25 @@ function queries(courses) {
   return result;
 }
 async function searchTimes(page, courses) {
-  await page.locator("button.search-button").click();
-  const dialog = page.getByRole("dialog");
-  await dialog.getByText(/courses in Winter 2027/i).waitFor();
+  const searchInput = page.getByPlaceholder("Course, instructor or section ID");
+  if (!(await searchInput.first().isVisible())) {
+    await page
+      .getByRole("button", { name: "Find a course", exact: true })
+      .click();
+  }
+  const visibleInput = searchInput.filter({ visible: true }).first();
+  await visibleInput.waitFor();
   await page.evaluate(() => {
     window.__searchSamples = [];
     window.addEventListener(
       "input",
       (e) => {
-        if (!e.target.matches(".search-field input")) return;
+        if (
+          !e.target.matches(
+            'input[placeholder="Course, instructor or section ID"]',
+          )
+        )
+          return;
         const start = performance.now(),
           { expected } = window.__query;
         const check = () => {
@@ -336,7 +343,7 @@ async function searchTimes(page, courses) {
       window.__query = q;
       window.__searchSamples = [];
     }, q);
-    await dialog.locator(".search-field input").fill(q.query);
+    await visibleInput.fill(q.query);
     try {
       await page.waitForFunction(
         () => window.__searchSamples.length === 1,

@@ -127,6 +127,7 @@ export function entries(p: Selection[], by: Map<string, Course>): Entry[] {
     return course && option ? [{ course, option }] : [];
   });
 }
+export const officialTSS = "https://sis.ucsd.edu/";
 export function trustedBooking(o: Option) {
   try {
     const u = new URL(o.tssUrl || "");
@@ -138,7 +139,7 @@ export function trustedBooking(o: Option) {
     )
       return u.href;
   } catch {}
-  return "https://sis.ucsd.edu/";
+  return officialTSS;
 }
 export function localAsset(path: string) {
   return new URL(import.meta.env.BASE_URL + path, document.baseURI).href;

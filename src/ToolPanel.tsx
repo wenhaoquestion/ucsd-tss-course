@@ -9,6 +9,7 @@ import {
   ChevronRight,
   WandSparkles,
   CalendarClock,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   type T,
@@ -20,6 +21,8 @@ import {
   weekdays,
   dayZh,
   place,
+  officialTSS,
+  trustedBooking,
 } from "./model";
 import { type Saved, shareUrl } from "./store";
 import { makeIcs } from "./calendar";
@@ -39,10 +42,12 @@ export function Dialog({
   title,
   onClose,
   children,
+  className = "",
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
+  className?: string;
 }) {
   const r = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -53,7 +58,8 @@ export function Dialog({
   return (
     <dialog
       ref={r}
-      className="dialog"
+      className={`dialog ${className}`}
+      aria-label={title}
       onCancel={onClose}
       onClick={(e) => {
         if (e.target === r.current) onClose();
@@ -557,7 +563,10 @@ export function ToolPanel({
                 className="outline"
                 onClick={() => book({ course, option })}
               >
-                Open TSS ↗
+                {trustedBooking(option) === officialTSS && option.sectionId
+                  ? t("Copy ID & open TSS", "复制班号并前往 TSS")
+                  : t("Open TSS", "前往 TSS")}
+                <ArrowUpRight size={14} />
               </button>
             </div>
           ))}

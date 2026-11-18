@@ -65,6 +65,26 @@
 .qp-route-details summary {
   font-size: 0.73rem;
 }
+.qp-route-room-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+.qp-route-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #d5dfda;
+  border-radius: 6px;
+  padding: 5px 7px;
+  color: #315955;
+  background: #f0f5f2;
+  font-weight: 650;
+}
+.qp-route-room:hover {
+  background: #e1ede6;
+}
 .qp-route .qp-route-credit {
   font-size: 0.65rem;
   color: #586052;
@@ -79,11 +99,7 @@
   width: max-content;
   color: #444941;
 }
-.qp-route small,
-.qp-route footer {
+.qp-route small {
   display: block;
   color: #516052;
-}
-.qp-route footer {
-  font-size: 0.7rem;
 }

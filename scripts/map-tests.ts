@@ -3,10 +3,12 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import {
   buildingDistance,
-  classroomUrl,
+  canShowClassroom,
   estimateTransfer,
+  listedRoom,
 } from "../src/routing/index";
 import { walkingPath, type RouteGraph } from "../src/routing/graph";
+import { findRoom, type Floor } from "../src/routing/indoor";
 
 const graph: RouteGraph = JSON.parse(
   readFileSync(
@@ -88,10 +90,30 @@ test("missing paths, remote meeting places and unverified access remain explicit
         permitted.has(`${Math.min(v, path[i])}/${Math.max(v, path[i])}`),
       ),
     );
-  assert.equal(classroomUrl({ remote: true }), null);
-  const link = new URL(classroomUrl(a, "WI27")!);
-  assert.equal(link.hostname, "wenhaoquestion.github.io");
-  assert.equal(link.searchParams.get("building"), "CENTR");
-  assert.equal(link.searchParams.get("room"), "115");
-  assert.equal(link.searchParams.get("term"), "WI27");
+  assert.equal(canShowClassroom({ remote: true }), false);
+  assert.equal(canShowClassroom({ building: "TBA" }), false);
+  assert.equal(canShowClassroom(a), true);
+  assert.equal(listedRoom({ building: "MOS", room: "0113" }), "0113");
+});
+
+test("public maps only highlight rooms with an unambiguous matching schedule key or label", () => {
+  const first: Floor = {
+    id: "1",
+    label: "First Floor",
+    shortLabel: "1",
+    outline: [],
+    rooms: [
+      { id: "a", label: "MO0113", scheduleKey: "0113" },
+      { id: "b", label: "102" },
+      { id: "c", label: "102" },
+      { id: "d", label: "B402A" },
+    ],
+    unplaced: [{ id: "e", label: "R101" }],
+  };
+  const stages = { building: "MOS", name: "Mosaic", floors: [first] };
+  assert.equal(findRoom(stages, "0113")?.room.id, "a");
+  assert.equal(findRoom(stages, "113"), undefined);
+  assert.equal(findRoom(stages, "102"), undefined);
+  assert.equal(findRoom(stages, "b402a")?.room.id, "d");
+  assert.equal(findRoom(stages, "R101")?.room.footprint, undefined);
 });

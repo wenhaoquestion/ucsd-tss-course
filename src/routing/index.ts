@@ -81,15 +81,14 @@ export function describeTransfer(
   return reasonText[result.reasonCode][lang === "zh" ? 1 : 0];
 }
 
-export function classroomUrl(location: TransferLocation, term?: string) {
+export function canShowClassroom(location: TransferLocation) {
   const code = locationCode(location);
-  if (unknown.test(code) || remote.test(code)) return null;
-  const url = new URL("https://wenhaoquestion.github.io/ucsd-classrooms/");
-  url.searchParams.set("building", code);
-  if (location.room && !unknown.test(location.room.trim().toUpperCase()))
-    url.searchParams.set("room", location.room.trim());
-  if (term) url.searchParams.set("term", term);
-  return url.toString();
+  return !unknown.test(code) && !remote.test(code);
+}
+
+export function listedRoom(location: TransferLocation) {
+  const room = (location.room ?? "").trim();
+  return unknown.test(room.toUpperCase()) ? "" : room;
 }
 
 export function buildingDistance(

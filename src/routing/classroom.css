@@ -1,0 +1,152 @@
+.qp-classroom {
+  display: grid;
+  gap: 14px;
+  color: var(--ink, #172124);
+}
+.qp-classroom-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qp-classroom-heading > div {
+  display: grid;
+  gap: 3px;
+}
+.qp-classroom-heading > div > span {
+  color: var(--muted, #546364);
+  font-size: 0.85rem;
+}
+.qp-classroom-pin {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #e4ecea;
+  color: #315955;
+}
+.qp-classroom-name {
+  font-size: 1.55rem;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.qp-classroom-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: #e9eeed;
+  padding: 4px;
+  border-radius: 10px;
+}
+.qp-classroom-tabs button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  min-height: 42px;
+  font-weight: 650;
+}
+.qp-classroom-tabs button[aria-pressed="true"] {
+  background: #fff;
+  border-color: #dbe3df;
+  box-shadow: 0 1px 2px #31595518;
+}
+.qp-classroom-campus,
+.qp-classroom-drawing,
+.qp-classroom-message {
+  display: block;
+  width: 100%;
+  min-height: 150px;
+  max-height: 380px;
+  border: 1px solid #dce5e0;
+  border-radius: 12px;
+  background: #f1f5f2;
+}
+.qp-floor-outline {
+  fill: #eceddf;
+  stroke: #aab5a5;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.qp-campus-outline {
+  stroke: #b7c4b6;
+  fill: #dce8da;
+}
+.qp-campus-paths {
+  stroke: #99aea2;
+  stroke-width: 1.25;
+  fill: none;
+}
+.qp-campus-marker-ring {
+  fill: #3e6e66;
+  opacity: 0.23;
+}
+.qp-campus-marker {
+  fill: #315955;
+  stroke: #fff;
+  stroke-width: 2;
+}
+.qp-campus-label,
+.qp-room-number {
+  fill: #18403d;
+  font-weight: 750;
+  stroke: #f1f5f2;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  paint-order: stroke;
+}
+.qp-campus-north {
+  fill: #546364;
+  font-size: 0.75rem;
+}
+.qp-floor-select {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-weight: 650;
+}
+.qp-floor-select select {
+  min-height: 38px;
+  padding: 4px 28px 4px 8px;
+  border: 1px solid #cfdbd5;
+  border-radius: 6px;
+  background: #fff;
+  color: inherit;
+}
+.qp-room-outline,
+.qp-room-highlight {
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+.qp-room-outline {
+  fill: #f8f9f4;
+  stroke: #b0bcb4;
+}
+.qp-room-highlight {
+  fill: #8cc8bb;
+  stroke: #215a4e;
+  stroke-width: 1.8;
+}
+.qp-classroom-note {
+  margin: 0;
+  color: var(--muted, #546364);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.qp-classroom-note a {
+  color: inherit;
+  text-underline-offset: 2px;
+}
+.qp-classroom-message {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  padding: 14px;
+  text-align: center;
+}
+.qp-classroom-message p {
+  margin: 0 0 6px;
+}

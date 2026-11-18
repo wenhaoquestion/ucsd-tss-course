@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { MapPin } from "lucide-react";
 import {
-  classroomUrl,
+  canShowClassroom,
   describeTransfer,
   estimateTransfer,
+  listedRoom,
   locationCode,
   routedBuildings,
 } from "./index";
@@ -12,7 +14,12 @@ import type {
   TransferLocation,
 } from "./index";
 import { loadRouteGraph, walkingPath } from "./graph";
-import type { Point, RouteGraph } from "./graph";
+import type { RouteGraph } from "./graph";
+import {
+  drawCampusMap,
+  mapWidth as width,
+  mapHeight as height,
+} from "./campus-drawing";
 import "./route.css";
 
 export type RouteMapProps = {
@@ -20,58 +27,17 @@ export type RouteMapProps = {
   to: TransferLocation;
   gapMinutes: number;
   options?: RoutingOptions;
-  term?: string;
   lang?: RoutingLanguage;
+  onShowClassroom: (place: TransferLocation) => void;
 };
-const width = 520,
-  height = 220;
-
-function drawMap(graph: RouteGraph, path: number[]) {
-  if (!path.length) return null;
-  const points = path.map((i) => graph.nodes[i]);
-  const xs = points.map((p) => p[0]),
-    ys = points.map((p) => p[1]);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2,
-    cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-  const scale = Math.min(
-    (width - 100) / Math.max(95, Math.max(...xs) - Math.min(...xs)),
-    (height - 62) / Math.max(75, Math.max(...ys) - Math.min(...ys)),
-  );
-  const project = ([x, y]: Point): Point => [
-    Math.round((x - cx) * scale + width / 2),
-    Math.round((y - cy) * scale + height / 2),
-  ];
-  const visible = (p: Point) =>
-    p[0] >= -30 && p[0] <= width + 30 && p[1] >= -30 && p[1] <= height + 30;
-  const projected = graph.nodes.map(project);
-  const nearbyPaths: string[] = [];
-  for (const [a, b] of graph.edges)
-    if (visible(projected[a]) || visible(projected[b]))
-      nearbyPaths.push(`M${projected[a]}L${projected[b]}`);
-  const outlines = graph.outlines.flatMap((ring) => {
-    const ps = ring.map(project);
-    return ps.some(visible)
-      ? [
-          `M${ps.join("L")}${ring[0][0] === ring.at(-1)![0] && ring[0][1] === ring.at(-1)![1] ? "Z" : ""}`,
-        ]
-      : [];
-  });
-  return {
-    paths: nearbyPaths.join(""),
-    outlines: outlines.join(""),
-    route: points.map(project).join(" "),
-    start: project(points[0]),
-    end: project(points[points.length - 1]),
-  };
-}
 
 export function RouteMap({
   from,
   to,
   gapMinutes,
   options,
-  term,
   lang = "en",
+  onShowClassroom,
 }: RouteMapProps) {
   const zh = lang === "zh";
   const start = locationCode(from),
@@ -99,7 +65,13 @@ export function RouteMap({
   }, [canMap, attempt]);
   const artwork = useMemo(() => {
     if (!graph || !canMap) return null;
-    return drawMap(graph, walkingPath(graph, start, end, options?.stepFree));
+    const route = walkingPath(graph, start, end, options?.stepFree);
+    return route.length
+      ? drawCampusMap(
+          graph,
+          route.map((index) => graph.nodes[index]),
+        )
+      : null;
   }, [graph, start, end, canMap, options?.stepFree]);
   const labels = zh
     ? {
@@ -114,14 +86,17 @@ export function RouteMap({
         late: "Likely late",
         unknown: "Unverified",
       };
-  const roomLink = (place: TransferLocation) => {
-    const url = classroomUrl(place, term);
+  const roomButton = (place: TransferLocation) => {
     const label =
-      [place.building, place.room].filter(Boolean).join(" ") || "TBA";
-    return url ? (
-      <a href={url} target="_blank" rel="noreferrer">
-        {label}
-      </a>
+      [place.building, listedRoom(place)].filter(Boolean).join(" ") || "TBA";
+    return canShowClassroom(place) ? (
+      <button
+        className="qp-route-room"
+        type="button"
+        onClick={() => onShowClassroom(place)}
+      >
+        <MapPin size={13} aria-hidden="true" /> {label}
+      </button>
     ) : (
       <span>{label}</span>
     );
@@ -174,7 +149,7 @@ export function RouteMap({
             strokeWidth="1.45"
           />
           <polyline
-            points={artwork.route}
+            points={artwork.points.join(" ")}
             fill="none"
             stroke="#fff"
             strokeWidth="7"
@@ -182,7 +157,7 @@ export function RouteMap({
             strokeLinecap="round"
           />
           <polyline
-            points={artwork.route}
+            points={artwork.points.join(" ")}
             fill="none"
             stroke="#d63f26"
             strokeWidth="4"
@@ -190,27 +165,28 @@ export function RouteMap({
             strokeLinejoin="round"
             strokeLinecap="round"
           />
-          {[artwork.start, ...(start === end ? [] : [artwork.end])].map(
-            ([x, y], i) => (
-              <g key={i} transform={`translate(${x},${y})`}>
-                <circle r="6.5" fill="#20231f" stroke="white" strokeWidth="2" />
-                <text
-                  x={x > width / 2 ? -10 : 10}
-                  y="-9"
-                  textAnchor={x > width / 2 ? "end" : "start"}
-                  fontSize="14"
-                  fontFamily="system-ui,sans-serif"
-                  fontWeight="700"
-                  fill="#20231f"
-                  stroke="#fafaf6"
-                  strokeWidth="3.5"
-                  paintOrder="stroke"
-                >
-                  {i === 0 ? start : end}
-                </text>
-              </g>
-            ),
-          )}
+          {[
+            artwork.points[0],
+            ...(start === end ? [] : [artwork.points.at(-1)!]),
+          ].map(([x, y], i) => (
+            <g key={i} transform={`translate(${x},${y})`}>
+              <circle r="6.5" fill="#20231f" stroke="white" strokeWidth="2" />
+              <text
+                x={x > width / 2 ? -10 : 10}
+                y="-9"
+                textAnchor={x > width / 2 ? "end" : "start"}
+                fontSize="14"
+                fontFamily="system-ui,sans-serif"
+                fontWeight="700"
+                fill="#20231f"
+                stroke="#fafaf6"
+                strokeWidth="3.5"
+                paintOrder="stroke"
+              >
+                {i === 0 ? start : end}
+              </text>
+            </g>
+          ))}
           <text x="505" y="18" textAnchor="end" fontSize="11" fill="#61665d">
             N ↑
           </text>
@@ -237,7 +213,7 @@ export function RouteMap({
             ` · ${zh ? "最多迟到 " : "up to "}${Math.max(0, result.maxMinutes - gapMinutes)} ${zh ? "分钟" : "min late"}`}
         </span>
         <span className="qp-route-room-links">
-          {roomLink(from)} <span aria-hidden="true">→</span> {roomLink(to)}
+          {roomButton(from)} <span aria-hidden="true">→</span> {roomButton(to)}
         </span>
       </div>
       {!canMap && <p>{describeTransfer(result, lang)}</p>}
@@ -281,23 +257,6 @@ export function RouteMap({
             })}
           </small>
         )}
-        <footer>
-          <a
-            href="https://campusmap.ucsd.edu/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {zh ? "UCSD 官方地图 ↗" : "UCSD campus map ↗"}
-          </a>
-          {" · "}
-          <a
-            href={`${import.meta.env.BASE_URL}data/routes-sources.txt`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {zh ? "数据与精度" : "Data & accuracy"}
-          </a>
-        </footer>
       </details>
     </section>
   );

@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowRight,
-  ChevronDown,
-  CalendarDays,
-  Footprints,
-  Layers2,
-} from "lucide-react";
+import { ChevronDown, CalendarDays, Footprints, Layers2 } from "lucide-react";
 import {
   type Entry,
   type T,
@@ -29,6 +23,7 @@ interface Props {
   buffer: number;
   stepFree: boolean;
   onSearch: () => void;
+  onImport: () => void;
 }
 export function CalendarView({
   plan,
@@ -41,6 +36,7 @@ export function CalendarView({
   buffer,
   stepFree,
   onSearch,
+  onImport,
 }: Props) {
   const [week, setWeek] = useState("all"),
     [chosenDay, setPhoneDay] = useState<number | null>(null);
@@ -55,15 +51,27 @@ export function CalendarView({
     first = Math.min(9, ...tiles.map((k) => Math.floor(k.m.start! / 60))),
     last = Math.max(16, ...tiles.map((k) => Math.ceil(k.m.end! / 60)));
   const hours = Array.from({ length: last - first + 1 }, (_, i) => i + first);
-  const today = new Date().toLocaleDateString("sv-SE", {timeZone:"America/Los_Angeles"});
-  const scheduledDay = today >= "2027-01-04" && today <= "2027-03-20"
-    ? new Date(today+"T12:00:00Z").getUTCDay() || 7 : tiles[0]?.day || 1;
+  const today = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "America/Los_Angeles",
+  });
+  const scheduledDay =
+    today >= "2027-01-04" && today <= "2027-03-20"
+      ? new Date(today + "T12:00:00Z").getUTCDay() || 7
+      : tiles[0]?.day || 1;
   const phoneDay = Math.min(days, chosenDay ?? scheduledDay);
-  const firstStart = tiles.find(tile => tile.day === phoneDay)?.m.start;
+  const firstStart = tiles.find((tile) => tile.day === phoneDay)?.m.start;
   useEffect(() => {
-    if (!window.matchMedia("(max-width:620px)").matches || !scrollArea.current) return;
+    if (!window.matchMedia("(max-width:620px)").matches || !scrollArea.current)
+      return;
     const line = scrollArea.current.querySelector(".hour-axis span");
-    scrollArea.current.scrollTop = firstStart == null ? 0 : Math.max(0, (Math.floor(firstStart / 60) - first) * (line?.getBoundingClientRect().height || 49));
+    scrollArea.current.scrollTop =
+      firstStart == null
+        ? 0
+        : Math.max(
+            0,
+            (Math.floor(firstStart / 60) - first) *
+              (line?.getBoundingClientRect().height || 49),
+          );
   }, [phoneDay, firstStart, first, week]);
   const dayLabel = (i: number) =>
     lang === "zh" ? "周" + dayZh[i - 1] : weekdays[i - 1];
@@ -76,7 +84,7 @@ export function CalendarView({
     <section className="calendar-pane">
       <div className="calendar-head">
         <div>
-          <h1>{t("Weekly calendar", "每周课表")}</h1>
+          <h2>{t("Weekly calendar", "每周课表")}</h2>
         </div>
         <label className="select-shell week-select">
           <Layers2 size={14} />
@@ -109,7 +117,11 @@ export function CalendarView({
           </button>
         ))}
       </div>
-      {firstStart == null && plan.length > 0 && <p className="phone-day-empty">{t("No meetings on this day.","当天没有已知授课时段。")}</p>}
+      {firstStart == null && plan.length > 0 && (
+        <p className="phone-day-empty">
+          {t("No meetings on this day.", "当天没有已知授课时段。")}
+        </p>
+      )}
       <div ref={scrollArea} className="calendar-scroll">
         <div
           className="calendar-grid"
@@ -236,10 +248,21 @@ export function CalendarView({
       </div>
       {!plan.length && (
         <div className="calendar-empty">
-          <CalendarDays size={28} />
-          <strong>{t("Start with a course", "从一门课开始")}</strong>
-          <button className="quiet" onClick={onSearch}>
-            {t("Search courses", "搜索课程")} <ArrowRight size={14} />
+          <span className="empty-icon">
+            <CalendarDays size={25} aria-hidden="true" />
+          </span>
+          <h3>{t("Build your schedule", "开始排课")}</h3>
+          <p>
+            {t(
+              "Add a course to see its meetings here.",
+              "添加课程后，这里会显示上课时间。",
+            )}
+          </p>
+          <button className="primary" onClick={onSearch}>
+            {t("Find a course", "寻找课程")}
+          </button>
+          <button className="quiet" onClick={onImport}>
+            {t("Import a TSS schedule PDF", "导入 TSS 课表 PDF")}
           </button>
         </div>
       )}

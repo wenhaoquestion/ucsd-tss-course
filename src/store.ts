@@ -17,7 +17,6 @@ export interface Saved {
   watches: Watch[];
   first: string;
   second: string;
-  example: boolean;
 }
 export function initial(): Saved {
   return {
@@ -29,7 +28,6 @@ export function initial(): Saved {
     watches: [],
     first: "",
     second: "",
-    example: true,
   };
 }
 let opened: Promise<IDBDatabase> | undefined;
@@ -50,6 +48,27 @@ function valid(x: unknown): x is Saved {
     (x as Saved).plans.length === 2
   );
 }
+export function restoreSaved(value: unknown): Saved | null {
+  if (!valid(value)) return null;
+  const { example, ...saved } = value as Saved & { example?: unknown };
+
+  // Version 1 used to fill Plan A with these three packages on first launch.
+  const oldExample = [
+    { code: "CSE 12", id: "WI27:165078" },
+    { code: "MATH 20C", id: "WI27:163118" },
+    { code: "PSYC 1", id: "WI27:163966" },
+  ];
+  const [planA, planB] = saved.plans;
+  const isUntouchedExample =
+    example === true &&
+    Array.isArray(planA) &&
+    planA.length === oldExample.length &&
+    oldExample.every(
+      (entry, index) =>
+        planA[index]?.code === entry.code && planA[index]?.id === entry.id,
+    );
+  return isUntouchedExample ? { ...saved, plans: [[], planB] } : saved;
+}
 export async function readSaved() {
   try {
     const d = await db(),
@@ -58,11 +77,12 @@ export async function readSaved() {
         req.onsuccess = () => r(req.result);
         req.onerror = () => j(req.error);
       });
-    if (valid(v)) return v;
+    const saved = restoreSaved(v);
+    if (saved) return saved;
   } catch {}
   try {
     const v = JSON.parse(localStorage.getItem("quarterplan-state") || "null");
-    return valid(v) ? v : null;
+    return restoreSaved(v);
   } catch {
     return null;
   }

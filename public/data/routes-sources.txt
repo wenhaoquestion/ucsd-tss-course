@@ -5,8 +5,11 @@ https://www.openstreetmap.org/copyright
 https://opendatacommons.org/licenses/odbl/1-0/
 Download the complete derived graph at routes-graph.json, alongside this notice. Its coordinates are local metres east and south of the origin recorded in that file. Edge lengths are stored in decimetres. The final flag excludes a mapped stair or another known barrier from the avoid-stairs profile.
 
-Five extracts of OpenStreetMap's public map API cover the main La Jolla campus and Scripps. The data was fetched on 2026-11-18 UTC (November 17 in San Diego). Each building includes the source OSM way or relation identifier. The registrar building codes were matched by building name. Existing UCSD room and building links open UCSD Classroom Explorer:
+Five extracts of OpenStreetMap's public map API cover the main La Jolla campus and Scripps. The data was fetched on 2026-11-18 UTC (November 17 in San Diego). Each building includes the source OSM way or relation identifier. Registrar building codes were matched by building name.
+
+Classroom cards load published room and floor geometry within Quarterplan from UCSD Classroom Explorer. Floor labels and room positions are taken from that public data. If the archive has only a room listing or if the room is ambiguous, Quarterplan leaves the room position unmarked. The campus map distinguishes representative entry points from nearby paths.
 https://github.com/wenhaoquestion/ucsd-classrooms
+https://github.com/wenhaoquestion/ucsd-classrooms/blob/main/docs/indoor-geometry.md
 https://campusmap.ucsd.edu/
 
 17 of 71 matched buildings have a tagged entrance connected to the path network. Other matched points end on a mapped pedestrian route near the building footprint. Each building uses one representative access point. Indoor geometry, doorway widths, elevator availability, event closures and construction detours are unverified. The no-stairs profile excludes recorded steps and known barriers; unknown accessibility stays visible in the planner.
